@@ -19,6 +19,16 @@
                         <Image url="@../../profile.jpg" />
                      </image>
                   </ImageView>
+                  <ImageView fitHeight="432.0" fitWidth="298.0" layoutX="4.0" layoutY="108.0" opacity="0.79" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../ryanBorder.PNG" />
+                     </image>
+                  </ImageView>
+                  <ImageView fitHeight="127.0" fitWidth="382.0" layoutX="419.0" layoutY="-15.0" pickOnBounds="true">
+                     <image>
+                        <Image url="@../../Banner-PNG-Pic.png" />
+                     </image>
+                  </ImageView>
                   <Label fx:id="label" layoutX="480.0" layoutY="25.0" prefHeight="39.0" prefWidth="305.0" text="Welcome,">
                      <font>
                         <Font size="32.0" />
@@ -94,7 +104,7 @@
                            </effect></PasswordField>
                      </children>
                   </GridPane>
-                  <Button fx:id="updateInfoButton" defaultButton="true" layoutX="161.0" layoutY="540.0" mnemonicParsing="false" onAction="#updateInfo" text="Save Changes" />
+                  <Button fx:id="updateInfoButton" defaultButton="true" layoutX="111.0" layoutY="542.0" mnemonicParsing="false" onAction="#updateInfo" text="Save Changes" />
                   <Button defaultButton="true" layoutX="642.0" layoutY="577.0" mnemonicParsing="false" onAction="#displayLogin" text="Logout">
                      <font>
                         <Font size="26.0" />

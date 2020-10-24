@@ -40,6 +40,7 @@ public class Main extends Application {
 		}
 	}
 	static User currentUser = new User();
+	static Game currentGame = new Game();
 	
 	public static void main(String[] args) {
 		launch(args);

@@ -1,14 +1,22 @@
 package application;
 
+import java.awt.image.BufferedImage;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
 
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+
+import javafx.animation.Animation;
+import javafx.animation.Interpolator;
+import javafx.animation.RotateTransition;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -29,10 +37,19 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 public class Controller {
 
@@ -128,6 +145,7 @@ public class Controller {
 
 	private HashMap<String, User> users = new HashMap<>();
 	private HashMap<String, String> userAndPass = new HashMap<>();
+	private HashMap<String, Game> loadedGames = new HashMap<>();
 
 	@FXML
 	void displayHome(ActionEvent event) throws IOException {
@@ -474,6 +492,43 @@ public class Controller {
 	private PasswordField profilePassword = new PasswordField();
 
 	@FXML
+	private ImageView wheel = new ImageView();
+
+	private Game current = new Game();
+
+	// CONTROL table view clicks here
+	@FXML
+	public void clickItem(MouseEvent event) throws IOException {
+		if (event.getClickCount() == 2) // Checking double click
+		{
+			Main.currentGame = loadedGames.get(tableView.getSelectionModel().getSelectedItem().getName());
+
+			Parent CreateScene = FXMLLoader.load(getClass().getResource("genericGame.fxml"));
+			Scene scene = new Scene(CreateScene);
+
+			Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
+			window.setScene(scene);
+			window.show();
+
+		}
+	}
+
+	@FXML
+	private ImageView imageOneLink = new ImageView();
+
+	@FXML
+	private ImageView imageTwoLink = new ImageView();
+	@FXML
+	private ImageView imageThreeLink = new ImageView();
+
+	@FXML
+	private Label genericTitle = new Label();
+	
+	@FXML
+    private TextArea descriptionText = new TextArea();
+	
+
+	@FXML
 	private void initialize() {
 		label.textProperty().bind(Bindings.format("Welcome, " + Main.currentUser.getFirstName()));
 
@@ -491,43 +546,113 @@ public class Controller {
 		gamePrice.setCellValueFactory(new PropertyValueFactory<>("price"));
 
 		ArrayList<Game> games = loadGames();
-		for (Game g : games)
+		for (Game g : games) {
 			dataList.add(g);
-		
-		FilteredList<Game> filteredData = new FilteredList<>(dataList, b-> true);
-		
-		
+			loadedGames.put(g.getName(), g);
+		}
+
+		FilteredList<Game> filteredData = new FilteredList<>(dataList, b -> true);
+
 		filterField.textProperty().addListener((observable, oldValue, newValue) -> {
 			filteredData.setPredicate(game -> {
 				// If filter text is empty, display all persons.
-								
+
 				if (newValue == null || newValue.isEmpty()) {
 					return true;
 				}
-				
+
 				// Compare first name and last name of every person with filter text.
 				String lowerCaseFilter = newValue.toLowerCase();
-				
-				if (game.getName().toLowerCase().indexOf(lowerCaseFilter) != -1 ) {
+
+				if (game.getName().toLowerCase().indexOf(lowerCaseFilter) != -1) {
 					return true; // Filter matches first name.
 				} else if (game.getPrice().toLowerCase().indexOf(lowerCaseFilter) != -1) {
 					return true; // Filter matches last name.
-				}
-				     else  
-				    	 return false; // Does not match.
+				} else
+					return false; // Does not match.
 			});
 		});
-		
-		// 3. Wrap the FilteredList in a SortedList. 
+
+		// 3. Wrap the FilteredList in a SortedList.
 		SortedList<Game> sortedData = new SortedList<>(filteredData);
-		
+
 		// 4. Bind the SortedList comparator to the TableView comparator.
-		// 	  Otherwise, sorting the TableView would have no effect.
+		// Otherwise, sorting the TableView would have no effect.
 		sortedData.comparatorProperty().bind(tableView.comparatorProperty());
-		
+
 		// 5. Add sorted (and filtered) data to the table.
 		tableView.setItems(sortedData);
+
+		genericTitle.textProperty().bind(Bindings.format("" + Main.currentGame.getName()));
+		String url1 = Main.currentGame.getImage1();
+		String url2 = Main.currentGame.getImage2();
+		String url3 = Main.currentGame.getImage3();
+
+		if (url1 != null || url2 != null || url3 != null) {
+			if (!url1.equals("Image 1")) {
+				Image image1 = new Image(url1, true);
+				imageOneLink.setImage(image1);
+			} else {
+				Image image1 = new Image("https://picsum.photos/350/200", true);
+				imageOneLink.setImage(image1);
+			}
+			if (!url2.equals("Image 2")) {
+				Image image2 = new Image(url2, true);
+				imageTwoLink.setImage(image2);
+			}else {
+				Image image2 = new Image("https://picsum.photos/350/200", true);
+				imageTwoLink.setImage(image2);
+			}
+			if (!url3.equals("Image 3")) {
+				Image image3 = new Image(url3, true);
+				imageThreeLink.setImage(image3);
+			}else {
+				Image image3 = new Image("https://picsum.photos/350/200", true);
+				imageThreeLink.setImage(image3);
+			}
+		}
 		
+		
+		
+		if(Main.currentGame.getDescription() != null) {
+			
+			descriptionText.setText(Main.currentGame.getDescription());	
+		}
+		
+	}
+	
+	
+
+	@FXML
+	void spinWheel(ActionEvent event) {
+
+		// wheel.setRotate(wheel.getRotate() + 90);
+		int time = (int) (Math.random() * (4000 - 2000 + 1) + 2000);
+		RotateTransition rt = new RotateTransition(Duration.millis(3000), wheel);
+		rt.setByAngle(360);
+		rt.setCycleCount(Animation.INDEFINITE);
+		rt.setInterpolator(Interpolator.LINEAR);
+		rt.setRate(3);
+		rt.play();
+		new java.util.Timer().schedule(new java.util.TimerTask() {
+			@Override
+			public void run() {
+				rt.stop();
+
+			}
+		}, time);
+
+	}
+
+	@FXML
+	void displayRandomGame(ActionEvent event) throws IOException {
+
+		Parent CreateScene = FXMLLoader.load(getClass().getResource("Random.fxml"));
+		Scene scene = new Scene(CreateScene);
+
+		Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
+		window.setScene(scene);
+		window.show();
 
 	}
 
@@ -541,7 +666,7 @@ public class Controller {
 				String data = myReader.nextLine();
 				String[] vals = data.split(",");
 				Game temp = new Game(vals[0], vals[1], vals[2], vals[3], vals[4], vals[5], vals[6], vals[7], vals[8],
-						vals[9], vals[10], vals[11], vals[12],vals[13],vals[14],vals[15],vals[16],vals[17]);
+						vals[9], vals[10], vals[11], vals[12], vals[13], vals[14], vals[15], vals[16], vals[17]);
 				allGames.add(temp);
 			}
 			myReader.close();
@@ -665,6 +790,18 @@ public class Controller {
 	@FXML
 	void homeToProfile(ActionEvent event) throws IOException {
 		Parent CreateScene = FXMLLoader.load(getClass().getResource("Profile.fxml"));
+
+		Scene scene = new Scene(CreateScene);
+
+		Stage window = (Stage) homeMenuBar.getScene().getWindow();
+		window.setScene(scene);
+		window.show();
+
+	}
+
+	@FXML
+	void randomToHome(ActionEvent event) throws IOException {
+		Parent CreateScene = FXMLLoader.load(getClass().getResource("Home.fxml"));
 
 		Scene scene = new Scene(CreateScene);
 

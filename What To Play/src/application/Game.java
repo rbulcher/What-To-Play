@@ -24,6 +24,8 @@ public class Game {
 		this.a11 = a11;
 		this.a12 = a12;
 	}
+	public Game() {
+	}
 	private String name, description, image1, image2, image3, price;
 	private String a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12;
 	public String getName() {
